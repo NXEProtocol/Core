@@ -69,6 +69,8 @@ CScript COINBASE_FLAGS;
 
 const string strMessageMagic = "NXE Signed Message:\n";
 
+const int FIRST_HARDFORK_BLOCK_HEIGHT = 200;
+
 // Settings
 int64_t nTransactionFee = MIN_TX_FEE;
 int64_t nReserveBalance = 0;
@@ -972,6 +974,10 @@ int64_t GetProofOfWorkReward(int nHeight, int64_t nFees)
 		else if(pindexBest->nHeight < LAST_FAIR_LAUNCH_BLOCK)
     {
 		nSubsidy = 0 * COIN; // No reward block to prevent an instamine
+    }
+    else if(pindexBest->nHeight >= FIRST_HARDFORK_BLOCK_HEIGHT)
+    {
+        nSubsidy = 15 * COIN;
     }
 
     if (fDebug && GetBoolArg("-printcreation"))
