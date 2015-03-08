@@ -20,7 +20,6 @@ LIBPATHS= \
  -L"$(DEPSDIR)/lib/db48"
 
 USE_UPNP:=1
-USE_IPV6:=1
 
 LIBS= -dead_strip
 
@@ -63,19 +62,9 @@ CFLAGS += -Wall -Wextra -Wformat -Wno-ignored-qualifiers -Wformat-security -Wno-
     $(DEBUGFLAGS) $(DEFS) $(INCLUDEPATHS)
 
 OBJS= \
-   obj/groestl.o \
-    obj/blake.o \
-    obj/bmw.o \
-    obj/skein.o \
-    obj/keccak.o \
-    obj/shavite.o \
-    obj/jh.o \
-    obj/luffa.o \
-    obj/cubehash.o \
+	obj/shavite.o \
     obj/echo.o \
     obj/simd.o \
-    obj/hamsi.o \
-    obj/fugue.o \
     obj/alert.o \
     obj/version.o \
     obj/checkpoints.o \
@@ -87,8 +76,8 @@ OBJS= \
     obj/init.o \
     obj/irc.o \
     obj/keystore.o \
-    obj/miner.o \
     obj/main.o \
+    obj/miner.o \
     obj/net.o \
     obj/protocol.o \
     obj/bitcoinrpc.o \
@@ -98,21 +87,19 @@ OBJS= \
     obj/rpcwallet.o \
     obj/rpcblockchain.o \
     obj/rpcrawtransaction.o \
-    obj/rpcsmessage.o \
     obj/script.o \
     obj/sync.o \
     obj/util.o \
     obj/wallet.o \
     obj/walletdb.o \
     obj/noui.o \
-    obj/kernel.o \
     obj/pbkdf2.o \
+    obj/kernel.o \
     obj/scrypt.o \
-    obj/scrypt-arm.o \
     obj/scrypt-x86.o \
-    obj/scrypt-x86_64.o  \
+    obj/scrypt-x86_64.o \
     obj/smessage.o \
-    obj/stealth.o 
+	obj/stealth.o
 
 ifndef USE_UPNP
 	override USE_UPNP = -
@@ -124,10 +111,6 @@ ifdef STATIC
 else
 	LIBS += -lminiupnpc
 endif
-endif
-
-ifneq (${USE_IPV6}, -)
-	DEFS += -DUSE_IPV6=$(USE_IPV6)
 endif
 
 all: NXEd
@@ -155,13 +138,6 @@ obj/%.o: %.cpp
 	      -e '/^$$/ d' -e 's/$$/ :/' < $(@:%.o=%.d) >> $(@:%.o=%.P); \
 	  rm -f $(@:%.o=%.d)
 
-obj/%.o: %.c
-	$(CC) -c $(CFLAGS) -MMD -MF $(@:%.o=%.d) -o $@ $<
-	@cp $(@:%.o=%.d) $(@:%.o=%.P); \
-	  sed -e 's/#.*//' -e 's/^[^:]*: *//' -e 's/ *\\$$//' \
-	      -e '/^$$/ d' -e 's/$$/ :/' < $(@:%.o=%.d) >> $(@:%.o=%.P); \
-	  rm -f $(@:%.o=%.d)
-
 obj/zerocoin/%.o: zerocoin/%.cpp
 	$(CXX) -c $(xCXXFLAGS) -MMD -MF $(@:%.o=%.d) -o $@ $<
 	@cp $(@:%.o=%.d) $(@:%.o=%.P); \
@@ -175,14 +151,11 @@ obj/scrypt-x86.o: scrypt-x86.S
 obj/scrypt-x86_64.o: scrypt-x86_64.S
 	$(CXX) -c $(xCXXFLAGS) -MMD -o $@ $<
 
-obj/scrypt-arm.o: scrypt-arm.S
-	$(CXX) -c $(xCXXFLAGS) -MMD -o $@ $<
-
 NXEd: $(OBJS:obj/%=obj/%)
 	$(CXX) $(CFLAGS) -o $@ $(LIBPATHS) $^ $(LIBS)
 
 clean:
-	-rm -f NXEd
+        -rm -f NXEd
 	-rm -f obj/*.o
 	-rm -f obj/*.P
 	-rm -f obj/build.h
